@@ -1,0 +1,39 @@
+ 
+
+ 
+
+First author, year, Species Sequelae negative prior to diagnosis Time from Campylobacter Diagnosis of Diagnosis of sequelae Number of | Number Outcome
+reference number with Campylobacter? diagnosis to evaluation for Campylobacter people with developing
+chronic sequelae (Days) Campylobacter sequelae
+ReA
+Ternhag, [52] spp. NR 365 NR Physician/medical records* 57425 15 0.03%
+Schoenberg-Norio, jejuni NR 60 Confirmed+ Physician/medical records 201 8 3.98%
+51]
+Townes, [47] NR All were disease negative 42 Confirmed Combination 2384 33 138%
+Kosunen, [39] jejuni All were disease negative 365 Confirmed Physician/medical records 342 8 234%
+Petersen, [27] mix NR NR Confirmed Physician/medical records 41 0 0%
+Short, [25] Jejuni NR 240 Confirmed Physician/medical records 15 0 0%
+Hannu, [43] mix All were disease negative 60 Confirmed Physician/medical records 609 45 739%
+Hannu, [43] mix All were disease negative 60 Confirmed Combination 609 52 8.54%
+Hannu, [43] jejuni All were disease negative 60 Confirmed Specialist 535 37 6.92%
+Hannu, [43] coli All were disease negative 60 Confirmed Specialist 61 8 13.11%
+Hannu, [43] Undetermined All were disease negative 60 Confirmed Specialist 13 0 0%
+Melby, [32] Jejuni NR 42 Probable Self-reported disease status 159 1 0.63%
+Pitkanen, [23] Jejuni NR NR Confirmed Selfreported disease status 56 3 5.36%
+Locht, [37] mix All were disease negative 28 Confirmed Self-reported disease status 173 27 15.61%
+Schiellerup, [41] NR No — excluded~ 60 Confirmed Self-reported based on 1003 131 13.06%
+validated scale
+Hannu, [54] Jejuni All were disease negative 90 Probable Specialist 350 9 257%
+Pitkanen, [29] Jejuni All were disease negative NR Confirmed Combination 188 9 479%
+Helms, [38] NR All were disease negative 365 Confirmed Physician/medical records 17991 22 0.12%
+Ponka, [40] Jejuni NR NR Confirmed Self-reported disease status 283 6 2.12%
+Doorduyn, [44] NR NR 1080 Confirmed Self-reported disease status 434 20 461%
+Eastmond, [35] Jejuni All were disease negative 90 Confirmed Physician/medical records 88 1 1.14%
+Eastmond [35] Jejuni All were disease negative 90 Confirmed Physician/medical records 42 0 0%
+Melby, [55] mix NR NR Probable Self-reported disease status 77 2 2.60%
+Gumpel, [49] NR NR NR Confirmed Physician/medical records 33 8 24.24%
+Bremell, [33] NR NR 24 Confirmed Self-reported disease status 66 1 1.52%
+Reiter's
+Kosunen, [39] Jejuni All were disease negative Up to 365 Confirmed NR 342 1 0.29%
+Doorduyn, [44] NR NR 1080 Confirmed Self-reported disease status 457 0 0%
+
