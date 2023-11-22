@@ -7,24 +7,30 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Meta-Analysis Problem #1 (50 points)
+The following paper reviewed and meta-analyzed the proportion of Campylobacter cases that develop chronic sequelae, based on studies published prior to July 2011. (Keithlin 2014, “Systematic review and meta-analysis of the proportion of Campylobacter cases that develop chronic sequelae”). Import the number of cases that developed reactive arthritis (ReA) from page 7 of the article and follow the steps below to conduct a meta-analysis of the proportion/prevalence. 
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Please input data in the exact order from the paper.
+Calculate the proportion of people with Campylobacter who developed a ReA for each study.
+Add a count of 0.5 both to those reporting ReA outcome of 0% and to those totals.
+Calculate the logit of the outcome and logit of the standard error using the equation from Lipsey & Wilson. [Eq 3.5, p40].
 
-```{r cars}
-summary(cars)
+```{r}
+# read data
+keith_data = read.csv("./data/Keithlin2014_ReA.csv") %>% 
+  janitor::clean_names() %>% 
+  mutate(prop_seq = round(number_developing_sequelae/number_of_people_with_campylobacter,4)) %>% 
+  mutate(number_of_people_with_campylobacter_add = ifelse(prop_seq==0.0000, number_of_people_with_campylobacter+0.5, number_of_people_with_campylobacter),
+         number_developing_sequelae_add = ifelse(prop_seq==0.0000, number_developing_sequelae+0.5, number_developing_sequelae)) %>% 
+  mutate(prop_seq_add = number_developing_sequelae_add/number_of_people_with_campylobacter_add)
+
+  
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
