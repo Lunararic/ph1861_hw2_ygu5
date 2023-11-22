@@ -2,7 +2,7 @@
 title: "ph1861_hw2_ygu5"
 author: "Yue Gu"
 date: "2023-11-21"
-output: pdf_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -12,7 +12,7 @@ library(tidyverse)
 ```
 
 
-Meta-Analysis Problem #1 (50 points)
+#Meta-Analysis Problem #1 (50 points)
 The following paper reviewed and meta-analyzed the proportion of Campylobacter cases that develop chronic sequelae, based on studies published prior to July 2011. (Keithlin 2014, “Systematic review and meta-analysis of the proportion of Campylobacter cases that develop chronic sequelae”). Import the number of cases that developed reactive arthritis (ReA) from page 7 of the article and follow the steps below to conduct a meta-analysis of the proportion/prevalence. 
 
 Please input data in the exact order from the paper.
@@ -34,27 +34,67 @@ keith_data = read.csv("./data/Keithlin2014_ReA.csv") %>%
 # check total number of cases
 s1=sum(keith_data$number_developing_sequelae_add)
 # check total number
-s2=sum(keith_data$number_of_people_with_campylobacter)
+s2=sum(keith_data$number_of_people_with_campylobacter_add)
 # check the proportion developing ReA
 p1 = s1/s2
+
+```
+Now that the data are set, answer following questions with corresponding STATA or R code:  
+(a) List the number of cases, total number, the proportion developing ReA, the logit outcome, and the logit standard error for the K=25 studies.   
+```{r}
 # the logit outcome for the K=25 studies
 knitr::kable(keith_data %>% select(first_author_year_reference_number, logit_outcome))
 # the standard error for the K=25 studies
 knitr::kable(keith_data %>% select(first_author_year_reference_number, se_outcome))
 
 ```
-Now that the data are set, answer following questions with corresponding STATA or R code:  
-(a) List the number of cases, total number, the proportion developing ReA, the logit outcome, and the logit standard error for the K=25 studies.   
-The number of cases for the K=25 studies is `r s1`, total number is `r s2`, the proportion developing ReA is `r p1`, the logit outcome and standard error for each studies could be found above.    
+The number of cases for the K=25 studies is `r s1`, total number is `r s2`, the proportion developing ReA is `r p1`, the logit outcome and standard error for each studies could be found above  
 (b) Run a fixed effects meta-analysis using the exponential form (ie, exponentiating the result back to the original scale). Attach the forest plot.  
+```{r}
+# run fixed effects meta-analysis for a single proportion
+library(meta)
+m.bin <- metaprop(number_developing_sequelae_add,number_of_people_with_campylobacter_add,
+                 data = keith_data,
+                 studlab = paste(first_author_year_reference_number),
+                 comb.fixed = T, comb.random = T,
+                 method = 'GLMM',sm = "PLOGIT",
+                 model.glmm = "UM.FS")
+m.bin
 
+# forest plot
+forest(m.bin, leftcols = c('studlab'), overall = T, weight.study="random",hetstat = T, overall.hetstat = T)
+```
+
+The results from fixed effects meta-analysis and forest plot are shown above.  
 (c) What is the pooled estimate? Is it significant? Please interpret the result.  
-
+The pooled estimate for Heterogeniety across all the studies is 0.01 for common-effects model and 0.03 for random effects model and $I^2=0.98, \tau^2=2.4692$ with p<0.01, we interpret it as 98% of the variation across the studies is due to heterogeneity rather than chance and 2.4692 is the amount of heterogeneity between the study effect esimates; with significant p-value, we conclude that there is significant heterogeneity between the 25 studies, and further random effect meta-analysis is needed.  
 (d) If necessary, run a random effect meta-analysis using exponential form.  
-
+```{r}
+# random effect meta-analysis (same command in R)
+m.bin <- metaprop(number_developing_sequelae_add,number_of_people_with_campylobacter_add,
+                 data = keith_data,
+                 studlab = paste(first_author_year_reference_number),
+                 comb.fixed = T, comb.random = T,
+                 method = 'GLMM',sm = "PLOGIT",
+                 model.glmm = "UM.FS")
+m.bin
+```
+Based on the results, the pooled estimates for random effects is 0.0254 with wider CI of [0.0132, 0.0482], which are larger proportion and wider CI compared to common effects proportion.  
 (e) Why don’t we have to convert the proportion to Cohen’s D?  
+The Cohen's D need assumptions of normal distribution and we don't necessarily have norm-distribution here across all the studies. Also since we found significant heterogeneity across studies, the Cohen's D are not appropriate to use.    
+Write a short methods and results paragraph as if you were reporting these two sections in a journal article (refer to our in-class case studies).   
+Methods: We collected 25 studies measuring Campylobacter and chronic sequelae with ReA outcomes, the number of people with Campylobacter and the number developing sequelae are mainly used to calculate the percentage of outcome. 0.5 are added to the total number of people with Campylobacter for the outcomes that have 0% keep 4 decimal points in the original scales. Based on the collected studies, we run the meta-analysis investigating both random-effects and fixed-effects, and forest plot was used to demonstrate the weight of each studies and confidence interval for each proportion of ReA outcomes.  
+Results: Of the 25 studies included for meta-analysis, with the addition of 0.5, the total number of cases is 448, total number of subjects included is 83180 with the overall outcome of developing ReA as 0.54%. Results from meta-anlysis showed significant heterogeineity from the studies ($I^2=97.7%$) and a random-effects MA is needed. Based on the results, the pooled proportion for ReA outcome is 0.0254 with 95% CI of [0.0132,0.0482] and forest plot supports the highest weights is contributed from Gumpel et al. study with 0.24 proportion.  
 
-Write a short methods and results paragraph as if you were reporting these two sections in a journal article (refer to our in-class case studies).  
+#Meta-Analysis Problem #2 (50 points)
+We conducted a systematic review (SR) of second generation antidepressants that compared fluoxetine to any other anti-depressant. Although this SR resulted in an extensive network of multiple treatment comparisons, for this assignment, we will treat this review as “pairwise.” Thus we will assume all comparator arms to fluoxetine are called "other active treatment." The Excel file is attached above. The outcome is “efficacy” and the number experiencing efficacy and total number are given. If a study has 3 treatments, you will only compare fluoxetine with the first treatment given in that study.
 
+(a.) Conduct an appropriate pairwise meta-analysis of these RCT data. Present the forest plot and pooled effect size.
 
+(b.) Does there appear to be publication bias? Please justify in 2 sentences or less.
 
+(c.) Is a random or fixed effects model more appropriate here? Justify in 2 sentences or less.
+
+(d.) Write a very short Methods and a Results paragraph summarizing your findings from (a-c).
+
+(e.) Would you consider any subgroup or sensitivity analysis for this meta-analysis? Explain which one(s) and justify your answer.
