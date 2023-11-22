@@ -2,7 +2,9 @@
 title: "ph1861_hw2_ygu5"
 author: "Yue Gu"
 date: "2023-11-21"
-output: html_document
+output:
+  word_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -88,13 +90,58 @@ Results: Of the 25 studies included for meta-analysis, with the addition of 0.5,
 
 #Meta-Analysis Problem #2 (50 points)
 We conducted a systematic review (SR) of second generation antidepressants that compared fluoxetine to any other anti-depressant. Although this SR resulted in an extensive network of multiple treatment comparisons, for this assignment, we will treat this review as “pairwise.” Thus we will assume all comparator arms to fluoxetine are called "other active treatment." The Excel file is attached above. The outcome is “efficacy” and the number experiencing efficacy and total number are given. If a study has 3 treatments, you will only compare fluoxetine with the first treatment given in that study.
+(a) Conduct an appropriate pairwise meta-analysis of these RCT data. Present the forest plot and pooled effect size.
+```{r}
+# read data
+fluo_data = readxl::read_xlsx("./data/HW2 Fluoxetine RCT Data -1.xlsx",sheet = 1) %>% 
+  janitor::clean_names()
+# reshape the data into binary
+fluo_data_wide = fluo_data %>% 
+  mutate(study_id = ifelse(is.na(study_id), lag(study_id), study_id)) %>% 
+  filter(study_id!="") %>% 
+  group_by(study_id) %>%
+  mutate(row = row_number(),
+         trt = if_else(treatment=="fluoxetine", "fluoxetine", "others")) %>%
+  ungroup() %>%
+  pivot_wider(names_from = trt, values_from = c(number_efficacy,total_n), names_sep = "_") %>%
+  select(-row,-treatment,-weeks_followup,-outcome_scale) %>% 
+  mutate(number_efficacy_others = as.numeric(number_efficacy_others),
+         number_efficacy_fluoxetine = as.numeric(number_efficacy_fluoxetine)) %>% 
+  group_by(study_id) %>%
+  summarise(across(everything(), ~ if(all(is.na(.))) NA else sum(., na.rm = T)))
+# keep only the trt and control data
+fluo_data_wide$flu_e1=fluo_data_wide$number_efficacy_fluoxetine
+fluo_data_wide$flu_e0=fluo_data_wide$total_n_fluoxetine - fluo_data_wide$number_efficacy_fluoxetine
+fluo_data_wide$others_e1=fluo_data_wide$number_efficacy_others
+fluo_data_wide$others_e0=fluo_data_wide$total_n_others - fluo_data_wide$number_efficacy_others
+fluo_data_wide[is.na(fluo_data_wide)]=.5
+# check data
+new_list = fluo_data_wide[,c("study_id", "flu_e0", "flu_e1", "others_e0", "others_e1")]
+new_list
+# conduct pairwise meta-analysis
+m.bin <- metabin(others_e1, total_n_others, flu_e1, total_n_fluoxetine,
+                 data = fluo_data_wide,
+                 studlab = paste(study_id),
+                 comb.fixed = T,comb.random = T,
+                 method = 'mh',sm = "OR",
+                 model.glmm = "UM.FS")
+m.bin
 
-(a.) Conduct an appropriate pairwise meta-analysis of these RCT data. Present the forest plot and pooled effect size.
-
-(b.) Does there appear to be publication bias? Please justify in 2 sentences or less.
-
-(c.) Is a random or fixed effects model more appropriate here? Justify in 2 sentences or less.
-
-(d.) Write a very short Methods and a Results paragraph summarizing your findings from (a-c).
-
-(e.) Would you consider any subgroup or sensitivity analysis for this meta-analysis? Explain which one(s) and justify your answer.
+# forest plot
+forest(m.bin, leftcols = c('studlab'), cex=0.5)
+```
+The pooled effect size are shown in the forest plot with 1.1 OR from common effect model and 1.14 from random effects model.  
+(b) Does there appear to be publication bias? Please justify in 2 sentences or less.
+```{r}
+# plot funnel plot
+funnel.meta(m.bin, ylab = "Standard Error of log OR")
+# egger's test
+metabias(m.bin, method = "Egger")
+```
+Based on the funnel plot, we see a slight asymmetric pattern for the standard error of log OR and the p-value=0.0085 from the Egger's test is significant, indicating the publication bias might be concerning and is significantly strong.  
+(c) Is a random or fixed effects model more appropriate here? Justify in 2 sentences or less.
+Common effects model is more appropriate since we didn't found a significant heterogeneity across the studies from the meta-analysis model and $I^2=23.3%$.  
+(d) Write a very short Methods and a Results paragraph summarizing your findings from (a-c).  
+53 studies are included for meeting the inclusion criteria and we treat fluoxetine as control, and all other treatments as active treatments. The meta-analysis results are shown in the forest plot that we observe the strongest weight from the studies are Winokur2000 and the smallest weight study is Taner2006, while other studies mostly fall near the pooled OR line. We further check whether there is publication bias from the studies, from the funnel plot, we observed a significantly strong PB and Egger's test generates a significant p-value, confirming there is significant sub-group effects. In conclusion, given the non-significant heterogeneity across the studies, a common effects model would be better to consider with 1.10 as the pooled OR and since there is no PB found, subgroup analysis might be considered to further conduct.
+(e) Would you consider any subgroup or sensitivity analysis for this meta-analysis? Explain which one(s) and justify your answer.  
+Yes, since we did observe some asymmetric patterns from the funnels plot and the Egger's test is significant, there are significant small study effects in the study and futher subgroup or sensitivity analysis is needed to find which subgroup effects lead to the PB.
