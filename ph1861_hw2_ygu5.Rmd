@@ -7,7 +7,7 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-
+library(meta)
 library(tidyverse)
 ```
 
@@ -27,10 +27,34 @@ keith_data = read.csv("./data/Keithlin2014_ReA.csv") %>%
   mutate(prop_seq = round(number_developing_sequelae/number_of_people_with_campylobacter,4)) %>% 
   mutate(number_of_people_with_campylobacter_add = ifelse(prop_seq==0.0000, number_of_people_with_campylobacter+0.5, number_of_people_with_campylobacter),
          number_developing_sequelae_add = ifelse(prop_seq==0.0000, number_developing_sequelae+0.5, number_developing_sequelae)) %>% 
-  mutate(prop_seq_add = number_developing_sequelae_add/number_of_people_with_campylobacter_add)
+  mutate(prop_seq_add = number_developing_sequelae_add/number_of_people_with_campylobacter_add,
+         logit_outcome = log(prop_seq/(1-prop_seq)),
+         se_outcome = sqrt(1/(number_of_people_with_campylobacter_add*prop_seq_add)+1/(number_of_people_with_campylobacter_add*(1-prop_seq_add))))
 
-  
+# check total number of cases
+s1=sum(keith_data$number_developing_sequelae_add)
+# check total number
+s2=sum(keith_data$number_of_people_with_campylobacter)
+# check the proportion developing ReA
+p1 = s1/s2
+# the logit outcome for the K=25 studies
+knitr::kable(keith_data %>% select(first_author_year_reference_number, logit_outcome))
+# the standard error for the K=25 studies
+knitr::kable(keith_data %>% select(first_author_year_reference_number, se_outcome))
+
 ```
+Now that the data are set, answer following questions with corresponding STATA or R code:  
+(a) List the number of cases, total number, the proportion developing ReA, the logit outcome, and the logit standard error for the K=25 studies.   
+The number of cases for the K=25 studies is `r s1`, total number is `r s2`, the proportion developing ReA is `r p1`, the logit outcome and standard error for each studies could be found above.    
+(b) Run a fixed effects meta-analysis using the exponential form (ie, exponentiating the result back to the original scale). Attach the forest plot.  
+
+(c) What is the pooled estimate? Is it significant? Please interpret the result.  
+
+(d) If necessary, run a random effect meta-analysis using exponential form.  
+
+(e) Why don’t we have to convert the proportion to Cohen’s D?  
+
+Write a short methods and results paragraph as if you were reporting these two sections in a journal article (refer to our in-class case studies).  
 
 
 
